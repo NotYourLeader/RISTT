@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Secondary XML Timetable Viewer with CP</title>
+  <title>Secondary Timetable 2026-2027 V3</title>
   <style>
     :root {
       --kcc-green:#1EA270;
@@ -21,6 +21,11 @@
     header { padding:22px clamp(16px, 3vw, 36px); background:linear-gradient(135deg,#0f513f 0%, var(--kcc-green) 64%, #34b98a 100%); color:white; }
     header h1 { margin:0 0 6px; font-size:clamp(24px, 4vw, 38px); letter-spacing:-.04em; }
     header p { margin:0; opacity:.92; max-width:1100px; }
+    .header-shell { display:flex; align-items:center; gap:20px; max-width:1280px; margin:0 auto; }
+    .logo-card { flex:0 0 auto; width:min(260px, 34vw); background:white; border-radius:18px; padding:12px 14px; box-shadow:0 14px 34px rgba(0,0,0,.16); }
+    .kcc-logo { display:block; width:100%; height:auto; object-fit:contain; }
+    .header-copy { min-width:0; }
+    .release-chip { display:inline-flex; align-items:center; border:1px solid rgba(255,255,255,.36); background:rgba(255,255,255,.16); border-radius:999px; padding:5px 10px; font-size:12px; font-weight:850; letter-spacing:.04em; text-transform:uppercase; margin-bottom:10px; }
     main { padding:18px clamp(12px, 3vw, 36px) 42px; }
     .toolbar { display:grid; grid-template-columns: 1.05fr 1.75fr .75fr .85fr 1.1fr; gap:12px; align-items:end; background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:14px; box-shadow:0 10px 30px rgba(15,35,55,.06); position:sticky; top:0; z-index:20; }
     label { display:block; font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:700; margin:0 0 6px; }
@@ -144,8 +149,33 @@
     .snapshot-box { border:1px solid #e3e9f0; background:white; border-radius:13px; padding:10px; }
     .snapshot-box h4 { margin:0 0 8px; font-size:13px; }
     .section-label { margin:10px 0 6px; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:850; }
+
+    .release-panel, .allocation-panel { background:var(--panel); border:1px solid var(--line); border-radius:22px; padding:clamp(16px, 3vw, 28px); box-shadow:0 10px 30px rgba(15,35,55,.06); }
+    .release-grid { display:grid; grid-template-columns:minmax(0, .95fr) minmax(0, 1.05fr); gap:16px; align-items:start; }
+    .release-card { border:1px solid var(--line); border-radius:18px; padding:16px; background:#fff; }
+    .release-card h2, .release-card h3, .allocation-panel h2 { margin:0 0 8px; letter-spacing:-.03em; }
+    .release-card p, .allocation-panel p { color:#3b4656; line-height:1.5; margin:0; }
+    .change-list { display:grid; gap:10px; margin:12px 0 0; padding:0; list-style:none; }
+    .change-list li { display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:start; border:1px solid #e5ecf3; border-radius:14px; padding:11px 12px; background:#fbfcfe; color:#2f3b4a; line-height:1.42; }
+    .change-list li::before { content:'✓'; display:inline-grid; place-items:center; width:22px; height:22px; border-radius:999px; background:#e9f7f0; color:#0d6848; font-weight:900; }
+    .allocation-header { display:grid; grid-template-columns:1fr minmax(220px,.55fr) minmax(180px,.35fr) auto; gap:12px; align-items:end; margin:14px 0; }
+    .allocation-toolbar-note { color:var(--muted); font-size:12px; line-height:1.4; margin-top:6px; }
+    .allocation-wrap { max-height:calc(100vh - 230px); }
+    .allocation-table { min-width:1180px; table-layout:auto; }
+    .allocation-table th, .allocation-table td { padding:10px; vertical-align:top; }
+    .allocation-table thead th { white-space:nowrap; }
+    .allocation-table tbody th { position:static; width:auto; background:#fff; font-size:13px; }
+    .allocation-teacher { min-width:210px; font-weight:850; color:#14213d; }
+    .allocation-hours { font-size:22px; font-weight:900; letter-spacing:-.03em; white-space:nowrap; }
+    .alloc-stack { display:flex; flex-wrap:wrap; gap:6px; align-items:flex-start; }
+    .alloc-pill { display:inline-flex; align-items:flex-start; border:1px solid #dfe7ef; border-radius:999px; background:#fbfcfe; padding:5px 8px; font-size:12px; line-height:1.25; color:#334155; max-width:100%; }
+    .alloc-pill strong { margin-right:4px; color:#14213d; }
+    .alloc-muted { color:var(--muted); font-size:12px; line-height:1.35; }
+    .allocation-empty { padding:20px; color:var(--muted); }
     @media (max-width: 900px) {
       .toolbar, .xml-source { grid-template-columns:1fr; position:relative; }
+      .header-shell, .release-grid, .allocation-header { grid-template-columns:1fr; display:grid; }
+      .logo-card { width:min(320px, 90vw); }
       .button-row { justify-content:flex-start; }
       .summary { grid-template-columns:repeat(2, minmax(0,1fr)); }
       .keypoints-hero, .keypoint-grid { grid-template-columns:1fr; }
@@ -171,12 +201,22 @@
 </head>
 <body>
 <header>
-  <h1>Secondary XML Timetable Viewer with CP</h1>
-  <p>GitHub-ready viewer hydrated directly from an external aSc XML export. Replace timetable.xml in the same folder to refresh the timetable without regenerating this HTML file. Student records are ignored by the viewer.</p>
+  <div class="header-shell">
+    <div class="logo-card" aria-label="Raha International School Khalifa City Campus logo">
+      <img class="kcc-logo" src="data:image/webp;base64,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" alt="Raha International School Khalifa City Campus">
+    </div>
+    <div class="header-copy">
+      <div class="release-chip">2026–2027 · V3 release</div>
+      <h1>Secondary Timetable 2026-2027 V3</h1>
+      <p>GitHub-ready viewer hydrated directly from an external aSc XML export. Replace timetable.xml in the same folder to refresh the timetable without regenerating this HTML file. Student records are ignored by the viewer.</p>
+    </div>
+  </div>
 </header>
 <main>
   <nav class="tab-nav" aria-label="Viewer sections">
     <button class="tab-btn" data-section="timetableSection" aria-selected="true">Timetable viewer</button>
+    <button class="tab-btn" data-section="teacherAllocationSection" aria-selected="false">Teacher allocations</button>
+    <button class="tab-btn" data-section="changelogSection" aria-selected="false">Changelog</button>
     <button class="tab-btn" data-section="keypointsSection" aria-selected="false">Key points and assumptions</button>
   </nav>
 
@@ -247,10 +287,79 @@
   </section>
 
   <div class="notice">
-    Notes: This viewer loads the timetable from an external aSc XML file. On GitHub Pages, keep this HTML file and timetable.xml in the same folder, then replace timetable.xml whenever the timetable changes. Simple cards show only the subject and relevant group/class information; tick Detailed view to add teacher, room and week labels. Student records in the XML are ignored.
+    Notes: This viewer loads the timetable from an external aSc XML file. On GitHub Pages, keep this HTML file and timetable.xml in the same folder, then replace timetable.xml whenever the timetable changes. Simple cards show subject, unique group/class labels, teacher names and rooms where available; tick Detailed view to add fuller metadata and week labels. Student records in the XML are ignored.
   </div>
   <div class="footer-note" id="footerNote"></div>
 
+  </section>
+
+  <section id="teacherAllocationSection" class="page-section" aria-label="Teacher allocations">
+    <div class="allocation-panel">
+      <h2>Teacher allocation overview</h2>
+      <p>Use this report to see each teacher’s estimated weekly allocation without manually counting timetable cards. Week A-only and Week B-only lessons count as 0.5 hours each in the average weekly total.</p>
+      <div class="allocation-header">
+        <div>
+          <label for="allocationSearch">Search teacher, subject, grade or room</label>
+          <input type="search" id="allocationSearch" placeholder="Type to filter allocations…">
+        </div>
+        <div>
+          <label for="allocationLoadFilter">Load band</label>
+          <select id="allocationLoadFilter">
+            <option value="all">All loads</option>
+            <option value="light">≤ 16 hours</option>
+            <option value="standard">17–24 hours</option>
+            <option value="heavy">25+ hours</option>
+          </select>
+        </div>
+        <div>
+          <label for="allocationSort">Sort by</label>
+          <select id="allocationSort">
+            <option value="teacher">Teacher A–Z</option>
+            <option value="hours-desc">Hours high–low</option>
+            <option value="hours-asc">Hours low–high</option>
+          </select>
+        </div>
+        <div>
+          <label>Actions</label>
+          <button id="downloadAllocationCsv" type="button">Allocation CSV</button>
+        </div>
+      </div>
+      <div class="allocation-toolbar-note">Subject and grade-level totals are derived from scheduled XML cards. Multi-class cards are counted once for teacher total time and proportionally split across grade/section breakdowns.</div>
+      <section class="summary allocation-summary" id="allocationSummary"></section>
+      <section class="table-wrap allocation-wrap">
+        <table id="teacherAllocationTable" class="allocation-table" aria-label="Teacher allocation summary"></table>
+      </section>
+    </div>
+  </section>
+
+  <section id="changelogSection" class="page-section" aria-label="V3 changelog">
+    <div class="release-panel">
+      <div class="release-grid">
+        <article class="release-card">
+          <h2>Secondary Timetable 2026-2027 V3</h2>
+          <p>This release focuses on making the timetable clearer for staff: cleaner cards, visible teachers and rooms, a KCC-branded page header, and an all-teacher allocation report.</p>
+          <div class="pill-row">
+            <span class="pill">KCC branding</span>
+            <span class="pill">Teacher allocation report</span>
+            <span class="pill">Cleaner group labels</span>
+            <span class="pill">Class-view teacher names</span>
+            <span class="pill">Room visibility</span>
+          </div>
+        </article>
+        <article class="release-card">
+          <h3>Addressed in this release</h3>
+          <ul class="change-list">
+            <li>Renamed the page and browser title to <strong>Secondary Timetable 2026-2027 V3</strong>.</li>
+            <li>Added the Raha International School Khalifa City Campus logo to the page header.</li>
+            <li>Added a teacher allocation tab showing total hours, subject hours, grade-level/section hours and rooms.</li>
+            <li>Cleaned repeated group labels so cards show unique group names only.</li>
+            <li>Updated class view cards so the teacher name is visible without switching to teacher view.</li>
+            <li>Added room numbers to cards where room data is present in the XML.</li>
+            <li>Kept the existing timetable, Week A/B filtering, CSV export and manual XML loader behaviour.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
   </section>
 
   <section id="keypointsSection" class="page-section" aria-label="Key points and assumptions">
@@ -383,7 +492,7 @@ let DATA = createEmptyData();
 function createEmptyData() {
   return {
     meta: {
-      title: 'Secondary XML Timetable Viewer with CP',
+      title: 'Secondary Timetable 2026-2027 V3',
       sourceXml: '',
       sourceWorkbook: 'student records ignored; no workbook embedded',
       generated: new Date().toISOString().slice(0, 10),
@@ -517,11 +626,11 @@ function parseAscXml(xmlText, sourceName='uploaded XML') {
     const weekShort = weekDef?.short || fallbackWeekShort;
     const terms = attr(card, 'terms') || attr(lesson, 'terms') || attr(lesson, 'termsdefid') || '';
 
-    const teachers = teacherIds.map(id => mapName(teacherMap, id, ['name']));
-    const classes = classIds.map(id => mapName(classMap, id, ['name', 'short']));
-    const groups = groupIds.map(id => mapName(groupMap, id, ['name']));
-    const rooms = roomIds.map(id => mapName(classroomMap, id, ['name', 'short']));
-    const groupByClass = groupIds.map((groupId, index) => {
+    const teachers = uniq(teacherIds.map(id => mapName(teacherMap, id, ['name'])));
+    const classes = uniq(classIds.map(id => mapName(classMap, id, ['name', 'short'])));
+    const groups = uniq(groupIds.map(id => mapName(groupMap, id, ['name'])));
+    const rooms = uniq(roomIds.map(id => mapName(classroomMap, id, ['name', 'short'])));
+    const groupByClassRaw = groupIds.map((groupId, index) => {
       const group = groupMap.get(groupId);
       const classId = attr(group, 'classid') || classIds[index] || '';
       return {
@@ -530,6 +639,13 @@ function parseAscXml(xmlText, sourceName='uploaded XML') {
         classId,
         className: classId ? mapName(classMap, classId, ['name', 'short']) : ''
       };
+    });
+    const groupByClassSeen = new Set();
+    const groupByClass = groupByClassRaw.filter(item => {
+      const key = `${item.classId}|${item.name}`;
+      if (groupByClassSeen.has(key)) return false;
+      groupByClassSeen.add(key);
+      return true;
     });
 
     for (const dayKey of expandDays(attr(card, 'days'))) {
@@ -591,7 +707,7 @@ function parseAscXml(xmlText, sourceName='uploaded XML') {
 
   return {
     meta: {
-      title: 'Secondary XML Timetable Viewer with CP',
+      title: 'Secondary Timetable 2026-2027 V3',
       sourceXml: sourceName,
       sourceWorkbook: 'student records ignored; no workbook embedded',
       generated: new Date().toISOString().slice(0, 10),
@@ -656,6 +772,12 @@ const activeTitle = document.getElementById('activeTitle');
 const activeSubtitle = document.getElementById('activeSubtitle');
 const sourceNote = document.getElementById('sourceNote');
 const footerNote = document.getElementById('footerNote');
+const allocationSearch = document.getElementById('allocationSearch');
+const allocationLoadFilter = document.getElementById('allocationLoadFilter');
+const allocationSort = document.getElementById('allocationSort');
+const teacherAllocationTable = document.getElementById('teacherAllocationTable');
+const allocationSummary = document.getElementById('allocationSummary');
+const downloadAllocationCsvButton = document.getElementById('downloadAllocationCsv');
 
 const tabButtons = Array.from(document.querySelectorAll('.tab-btn'));
 tabButtons.forEach(btn => {
@@ -715,7 +837,8 @@ function cardHtml(ev) {
     const lines = [];
     if (state.view !== 'class') lines.push(`<strong>Class:</strong> ${esc(ev.classes.join(', ') || '—')}`);
     if (groupLine) lines.push(groupLine);
-    if (state.view === 'subject' && ev.teachers.length) lines.push(`<strong>Teacher:</strong> ${esc(ev.teachers.join(', '))}`);
+    if (state.view !== 'teacher' && ev.teachers.length) lines.push(`<strong>Teacher:</strong> ${esc(ev.teachers.join(', '))}`);
+    if (ev.rooms.length) lines.push(`<strong>Room:</strong> ${esc(ev.rooms.join(', '))}`);
     return `<div class="card compact" style="--h:${ev.subjectHue}">
       <div class="topline"><div class="subject">${esc(subject)}</div></div>
       ${lines.length ? `<div class="meta">${lines.join('<br>')}</div>` : ''}
@@ -1033,6 +1156,149 @@ function renderProvisional(el) {
     ${deptRows.length ? miniTable(['Slot','Teachers / department group'], deptRows) : '<div class="demo-note">No department meeting cards are currently embedded.</div>'}
     <div class="demo-actions">${action('class','Careers Program 1','Open Careers Program','all',true)}${action('subject','BTEC','Open BTEC')}${action('subject','Dept Meeting','Open Dept Meetings')}${action('subject','Theory of Knowledge','Open ToK')}</div>`;
 }
+
+function eventWeight(ev) {
+  const weeks = String(ev.weeks || '');
+  if (!weeks) return 1;
+  if (/^[01]+$/.test(weeks) && weeks.length > 1) {
+    const active = (weeks.match(/1/g) || []).length;
+    return active ? active / weeks.length : 0;
+  }
+  return 1;
+}
+function fmtHours(value) {
+  const n = Number(value || 0);
+  if (Math.abs(n - Math.round(n)) < 0.05) return String(Math.round(n));
+  return n.toFixed(1).replace(/\.0$/, '');
+}
+function gradeLevelFromClass(className) {
+  const c = String(className || '').trim();
+  if (/career|\bCP\b/i.test(c)) return 'CP';
+  if (/^DP\s*1|^DP1/i.test(c)) return 'DP1';
+  if (/^DP\s*2|^DP2/i.test(c)) return 'DP2';
+  const m = c.match(/^(\d{1,2})[A-Za-z]?/);
+  if (m) return `G${m[1]}`;
+  return c || 'Other';
+}
+function sectionLabelForEvent(ev, className) {
+  const related = (ev.groupByClass || []).filter(g => g.className === className || (!g.className && ev.classes.includes(className))).map(g => g.name).filter(Boolean);
+  const cleanGroups = uniq(related).filter(g => g && g !== 'Entire class' && g !== className);
+  if (!cleanGroups.length) return className;
+  const compactGroups = compactList(cleanGroups, 2).join(', ');
+  return `${className}: ${compactGroups}`;
+}
+function summarizeMap(map, maxItems=8) {
+  return Array.from(map.values()).sort((a,b) => b.hours - a.hours || a.name.localeCompare(b.name, undefined, {numeric:true})).slice(0, maxItems);
+}
+function buildTeacherAllocationRows() {
+  return (DATA.selectors.teacher || []).map(teacher => {
+    const evs = DATA.events.filter(ev => ev.teacherIds.includes(teacher.id));
+    const subjects = new Map();
+    const grades = new Map();
+    const rooms = new Set();
+    let total = 0;
+    for (const ev of evs) {
+      const weight = eventWeight(ev);
+      total += weight;
+      const subjectName = ev.subject || 'Unassigned subject';
+      if (!subjects.has(subjectName)) subjects.set(subjectName, { name: subjectName, hours: 0, classes: new Set() });
+      const subjectItem = subjects.get(subjectName);
+      subjectItem.hours += weight;
+      ev.classes.forEach(c => subjectItem.classes.add(c));
+      ev.rooms.forEach(r => rooms.add(r));
+      const classList = ev.classes.length ? ev.classes : ['Unassigned'];
+      const share = classList.length ? weight / classList.length : weight;
+      for (const className of classList) {
+        const grade = gradeLevelFromClass(className);
+        if (!grades.has(grade)) grades.set(grade, { name: grade, hours: 0, sections: new Set() });
+        const gradeItem = grades.get(grade);
+        gradeItem.hours += share;
+        gradeItem.sections.add(sectionLabelForEvent(ev, className));
+      }
+    }
+    const subjectSummary = summarizeMap(subjects).map(item => ({ name:item.name, hours:item.hours, classes:Array.from(item.classes).sort((a,b)=>a.localeCompare(b, undefined, {numeric:true})) }));
+    const gradeSummary = summarizeMap(grades).map(item => ({ name:item.name, hours:item.hours, sections:compactList(Array.from(item.sections).sort((a,b)=>a.localeCompare(b, undefined, {numeric:true})), 8) }));
+    const rowText = [teacher.name, fmtHours(total), ...subjectSummary.map(s=>`${s.name} ${fmtHours(s.hours)}`), ...gradeSummary.map(g=>`${g.name} ${g.sections.join(' ')}`), ...rooms].join(' ').toLowerCase();
+    return { teacher, events: evs, total, subjectSummary, gradeSummary, rooms:Array.from(rooms).sort(), rowText };
+  }).filter(row => row.events.length || row.total > 0);
+}
+function allocationSubjectHtml(items) {
+  return `<div class="alloc-stack">${items.map(item => `<span class="alloc-pill"><strong>${esc(item.name)}:</strong> ${esc(fmtHours(item.hours))}h</span>`).join('') || '<span class="alloc-muted">No subject allocation</span>'}</div>`;
+}
+function allocationGradeHtml(items) {
+  return `<div class="alloc-stack">${items.map(item => `<span class="alloc-pill"><strong>${esc(item.name)}:</strong> ${esc(item.sections.join(', '))} · ${esc(fmtHours(item.hours))}h</span>`).join('') || '<span class="alloc-muted">No grade allocation</span>'}</div>`;
+}
+function getFilteredAllocationRows() {
+  let rows = buildTeacherAllocationRows();
+  const q = String(allocationSearch?.value || '').trim().toLowerCase();
+  const band = allocationLoadFilter?.value || 'all';
+  const sort = allocationSort?.value || 'teacher';
+  if (q) rows = rows.filter(row => row.rowText.includes(q));
+  if (band === 'light') rows = rows.filter(row => row.total <= 16);
+  if (band === 'standard') rows = rows.filter(row => row.total > 16 && row.total < 25);
+  if (band === 'heavy') rows = rows.filter(row => row.total >= 25);
+  if (sort === 'hours-desc') rows.sort((a,b) => b.total - a.total || a.teacher.name.localeCompare(b.teacher.name));
+  else if (sort === 'hours-asc') rows.sort((a,b) => a.total - b.total || a.teacher.name.localeCompare(b.teacher.name));
+  else rows.sort((a,b) => a.teacher.name.localeCompare(b.teacher.name, undefined, {numeric:true}));
+  return rows;
+}
+function renderAllocationSummary(rows) {
+  if (!allocationSummary) return;
+  const allRows = buildTeacherAllocationRows();
+  const totals = allRows.map(r => r.total).filter(Number.isFinite);
+  const avg = totals.length ? totals.reduce((a,b)=>a+b,0) / totals.length : 0;
+  const heavy = allRows.filter(r => r.total >= 25).length;
+  const light = allRows.filter(r => r.total <= 16).length;
+  allocationSummary.innerHTML = [
+    ['Teachers shown', rows.length, 'After current filters'],
+    ['Teachers with load', allRows.length, 'Scheduled in XML'],
+    ['Average hours', fmtHours(avg), 'Average weekly estimate'],
+    ['25+ hours', heavy, 'High allocation band'],
+    ['≤16 hours', light, 'Reduced allocation band']
+  ].map(s => `<div class="stat"><b>${esc(s[1])}</b><span>${esc(s[0])}</span><span>${esc(s[2])}</span></div>`).join('');
+}
+function renderTeacherAllocations() {
+  if (!teacherAllocationTable) return;
+  const rows = getFilteredAllocationRows();
+  renderAllocationSummary(rows);
+  if (!rows.length) {
+    teacherAllocationTable.innerHTML = '<tbody><tr><td class="allocation-empty">No teacher allocations match the current filters.</td></tr></tbody>';
+    return;
+  }
+  teacherAllocationTable.innerHTML = `<thead><tr><th>Teacher</th><th>Total hours</th><th>Subjects with hours</th><th>Grade levels, sections and hours</th><th>Rooms</th></tr></thead><tbody>${rows.map(row => `<tr>
+    <td class="allocation-teacher">${esc(row.teacher.name)}</td>
+    <td><div class="allocation-hours">${esc(fmtHours(row.total))}h</div><div class="alloc-muted">${row.events.length} XML card${row.events.length === 1 ? '' : 's'}</div></td>
+    <td>${allocationSubjectHtml(row.subjectSummary)}</td>
+    <td>${allocationGradeHtml(row.gradeSummary)}</td>
+    <td>${row.rooms.length ? `<div class="alloc-stack">${compactList(row.rooms, 10).map(room => `<span class="alloc-pill">${esc(room)}</span>`).join('')}</div>` : '<span class="alloc-muted">No room data</span>'}</td>
+  </tr>`).join('')}</tbody>`;
+}
+function allocationCsvEscape(v) { return csvEscape(v); }
+function downloadAllocationCsv() {
+  const rows = [['Teacher','Total hours','Subjects with hours','Grade levels, sections and hours','Rooms']];
+  for (const row of getFilteredAllocationRows()) {
+    rows.push([
+      row.teacher.name,
+      `${fmtHours(row.total)}h`,
+      row.subjectSummary.map(s => `${s.name}: ${fmtHours(s.hours)}h`).join('; '),
+      row.gradeSummary.map(g => `${g.name}: ${g.sections.join(', ')} (${fmtHours(g.hours)}h)`).join('; '),
+      row.rooms.join('; ')
+    ]);
+  }
+  const csv = rows.map(r => r.map(allocationCsvEscape).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'teacher_allocation_secondary_timetable_2026_2027_v3.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+allocationSearch?.addEventListener('input', renderTeacherAllocations);
+allocationLoadFilter?.addEventListener('change', renderTeacherAllocations);
+allocationSort?.addEventListener('change', renderTeacherAllocations);
+downloadAllocationCsvButton?.addEventListener('click', downloadAllocationCsv);
+
 function renderEvidenceBlocks() {
   document.querySelectorAll('.visual-demo').forEach(el => {
     const type = el.dataset.demo;
@@ -1050,6 +1316,7 @@ function renderEvidenceBlocks() {
 async function refreshAfterDataLoad(keepSelection=false) {
   populateSelect(keepSelection);
   render();
+  renderTeacherAllocations();
   renderEvidenceBlocks();
 }
 async function initViewer() {
